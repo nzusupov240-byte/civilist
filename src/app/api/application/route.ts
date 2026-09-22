@@ -3,13 +3,13 @@ import { NextResponse } from "next/server";
 /**
  * ОБРАБОТЧИК ЗАЯВКИ (серверная часть)
  * ------------------------------------------------------------------
- * Единственное место, которое нужно изменить для подключения
- * реального канала доставки заявок. Ниже уже подготовлены заготовки
- * для Telegram, email и произвольного webhook — раскомментируйте
- * нужный блок и добавьте переменные окружения в файл .env.local.
+ * Заявки отправляются в Telegram через бота. Для работы нужны две
+ * переменные окружения (задаются в настройках проекта на Vercel):
+ *   TELEGRAM_BOT_TOKEN — токен бота от @BotFather
+ *   TELEGRAM_CHAT_ID   — id чата/пользователя, куда слать заявки
  *
- * Никакие сторонние сервисы по умолчанию НЕ подключены: сейчас заявка
- * просто логируется на сервере, а клиенту возвращается успешный ответ.
+ * Если переменные не заданы, заявка просто пишется в лог сервера
+ * (сайт при этом продолжает работать без ошибок).
  */
 
 export interface ApplicationRequest {
@@ -28,6 +28,39 @@ function isValid(body: unknown): body is ApplicationRequest {
     typeof b.phone === "string" &&
     b.phone.trim().length > 0
   );
+}
+
+/** Отправка заявки в Telegram. Возвращает true при успехе. */
+async function sendToTelegram(app: ApplicationRequest): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return false; // канал не настроен
+
+  const text =
+    `🟦 Новая заявка с сайта «Цивилист»\n\n` +
+    `👤 Имя: ${app.name}\n` +
+    `📞 Телефон: ${app.phone}\n` +
+    `💬 Способ связи: ${app.contactMethod}\n` +
+    `📝 Сообщение: ${app.message?.trim() ? app.message.trim() : "—"}`;
+
+  const res = await fetch(
+    `https://api.telegram.org/bot${token}/sendMessage`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        disable_web_page_preview: true,
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    const detail = await res.text().catch(() => "");
+    throw new Error(`Telegram API ${res.status}: ${detail}`);
+  }
+  return true;
 }
 
 export async function POST(request: Request) {
@@ -50,56 +83,27 @@ export async function POST(request: Request) {
 
   const application = body as ApplicationRequest;
 
+  // Резервная запись в лог сервера (виден в Vercel → Logs)
+  console.log("Новая заявка:", {
+    name: application.name,
+    phone: application.phone,
+    contactMethod: application.contactMethod,
+    message: application.message ?? "",
+    receivedAt: new Date().toISOString(),
+  });
+
+  // Доставка в Telegram. Сбой доставки не блокирует посетителя:
+  // он получает подтверждение, а заявка остаётся в логах.
   try {
-    // --- Текущее поведение: заявка фиксируется в логах сервера ---
-    console.log("Новая заявка:", {
-      name: application.name,
-      phone: application.phone,
-      contactMethod: application.contactMethod,
-      message: application.message ?? "",
-      receivedAt: new Date().toISOString(),
-    });
-
-    // ================================================================
-    // ПОДКЛЮЧЕНИЕ РЕАЛЬНЫХ КАНАЛОВ — раскомментируйте нужный блок.
-    // ================================================================
-
-    // --- Telegram-бот ---
-    // const token = process.env.TELEGRAM_BOT_TOKEN;
-    // const chatId = process.env.TELEGRAM_CHAT_ID;
-    // if (token && chatId) {
-    //   const text =
-    //     `Новая заявка с сайта\n` +
-    //     `Имя: ${application.name}\n` +
-    //     `Телефон: ${application.phone}\n` +
-    //     `Способ связи: ${application.contactMethod}\n` +
-    //     `Сообщение: ${application.message ?? "—"}`;
-    //   await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ chat_id: chatId, text }),
-    //   });
-    // }
-
-    // --- Произвольный webhook (Make, n8n, CRM и т.п.) ---
-    // const webhookUrl = process.env.APPLICATION_WEBHOOK_URL;
-    // if (webhookUrl) {
-    //   await fetch(webhookUrl, {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify(application),
-    //   });
-    // }
-
-    // --- Email (например, через Resend / Nodemailer) ---
-    // ... добавьте отправку письма здесь ...
-
-    return NextResponse.json({ ok: true }, { status: 200 });
+    const delivered = await sendToTelegram(application);
+    if (!delivered) {
+      console.warn(
+        "Telegram не настроен: заданы не все переменные TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID."
+      );
+    }
   } catch (error) {
-    console.error("Ошибка обработки заявки:", error);
-    return NextResponse.json(
-      { error: "Внутренняя ошибка сервера. Попробуйте позже." },
-      { status: 500 }
-    );
+    console.error("Не удалось отправить заявку в Telegram:", error);
   }
+
+  return NextResponse.json({ ok: true }, { status: 200 });
 }

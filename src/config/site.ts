@@ -192,10 +192,10 @@ export const site = {
     title: "Контакты",
     companyName: "Юридическая компания «Цивилист»",
     city: "Бишкек, Кыргызстан",
-    phone: "" as string, // напр. "+996 XXX XXX XXX"
-    whatsapp: "" as string, // напр. "+996 XXX XXX XXX" или ссылка https://wa.me/996XXXXXXXXX
-    email: "" as string, // напр. "info@civilist.kg"
-    address: "" as string, // напр. "г. Бишкек, ул. ..., офис ..."
+    phone: "+996 554 717 077" as string,
+    whatsapp: "+996 554 717 077" as string, // тот же номер; ссылка соберётся как https://wa.me/996554717077
+    email: "Osoo-sivilist@mail.ru" as string,
+    address: "" as string, // адрес пока не указан — блок скрыт автоматически
   },
 
   footer: {

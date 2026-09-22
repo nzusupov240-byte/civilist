@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+/* ==================================================================
+   ЦВЕТОВАЯ ПАЛИТРА И ТОКЕНЫ ДИЗАЙНА
+   Строгая премиальная палитра: тёплый белый фон, графитовый текст,
+   тёмно-синий как основной акцент, приглушённое золото как деталь.
+   ================================================================== */
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f8f7f4; /* тёплый почти-белый для чередующихся секций */
+  --bg-navy: #0f1b30; /* глубокий тёмно-синий для тёмных блоков */
+  --bg-navy-2: #12233d;
+
+  --ink: #1a1d24; /* основной графитовый текст */
+  --ink-soft: #565b64; /* второстепенный текст */
+  --ink-muted: #8a8f98;
+
+  --navy: #16233b; /* тёмно-синий акцент */
+  --navy-hover: #1f3253;
+  --gold: #b0925a; /* приглушённое золото */
+  --gold-soft: #c7ac7d;
+
+  --line: #e7e4dd; /* тонкие разделители на светлом */
+  --line-navy: rgba(255, 255, 255, 0.12); /* разделители на тёмном */
+
+  --on-navy: #f3f1ec; /* текст на тёмном фоне */
+  --on-navy-soft: #b9c0cc;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-bg-navy: var(--bg-navy);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-navy: var(--navy);
+  --color-navy-hover: var(--navy-hover);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-line: var(--line);
+  --color-line-navy: var(--line-navy);
+  --color-on-navy: var(--on-navy);
+  --color-on-navy-soft: var(--on-navy-soft);
+
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-spectral);
+
+  --breakpoint-xs: 26rem;
+}
+
+/* ==================================================================
+   БАЗОВЫЕ СТИЛИ
+   ================================================================== */
+* {
+  border-color: var(--line);
+}
+
+html {
+  scroll-behavior: smooth;
+  /* отступ, чтобы sticky-шапка не перекрывала якорь при переходе */
+  scroll-padding-top: 5.5rem;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden; /* защита от горизонтального скролла */
+}
+
+::selection {
+  background: var(--navy);
+  color: #fff;
+}
+
+/* Крупные заголовки — благородная антиква */
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Мелкая надпись-«надзаголовок» с золотой чертой */
+.kicker {
+  font-size: 0.75rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+/* ==================================================================
+   АНИМАЦИЯ ПОЯВЛЕНИЯ ПРИ ПРОКРУТКЕ
+   ================================================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Тонкая линия-акцент под заголовками секций */
+.rule-gold {
+  width: 2.5rem;
+  height: 2px;
+  background: var(--gold);
+}

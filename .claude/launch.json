@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "civilist-dev",
+      "runtimeExecutable": "/private/tmp/claude-501/-Users-nursultanzusupov-Desktop--------------/22da1e98-bdd6-4971-b8f6-73e6aacdb1f7/scratchpad/nodejs/bin/node",
+      "runtimeArgs": ["node_modules/next/dist/bin/next", "start", "--port", "3000"],
+      "port": 3000
+    }
+  ]
+}

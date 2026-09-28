@@ -225,7 +225,7 @@ export const site = {
   // Аналитика. Пустые значения ("") — счётчик не подключается.
   analytics: {
     ga4: "G-M59VNVCC20", // Google Analytics 4 — Measurement ID
-    yandexMetrika: "" as string, // ID счётчика Яндекс.Метрики (номер), добавить позже
+    yandexMetrika: "113119839" as string, // ID счётчика Яндекс.Метрики
   },
 } as const;
 

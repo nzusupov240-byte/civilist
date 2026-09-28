@@ -217,10 +217,8 @@ export const site = {
     title: "Цивилист — юридическая компания в Бишкеке",
     description:
       "Юридическая компания «Цивилист» в Бишкеке. Юридические консультации, сопровождение бизнеса, договорное право, гражданское право и другие юридические услуги.",
-    // Текущий рабочий адрес сайта. Когда подключите домен civilist.kg —
-    // замените на "https://civilist.kg" (одно место обновляет canonical,
-    // Open Graph, sitemap и robots).
-    url: "https://civilist-eta.vercel.app",
+    // Основной адрес сайта. Обновляет canonical, Open Graph, sitemap и robots.
+    url: "https://civilist.plus",
     locale: "ru_RU",
   },
 } as const;

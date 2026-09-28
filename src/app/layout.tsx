@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Manrope, Spectral } from "next/font/google";
 import "./globals.css";
 import { site } from "@/config/site";
+import Analytics from "@/components/Analytics";
 
 // Основной текст — современный гротеск с поддержкой кириллицы
 const manrope = Manrope({
@@ -66,7 +67,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="ru"
       className={`${manrope.variable} ${spectral.variable} h-full`}
     >
-      <body className="min-h-full flex flex-col bg-bg text-ink">{children}</body>
+      <body className="min-h-full flex flex-col bg-bg text-ink">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }

@@ -57,6 +57,12 @@ export default function ApplicationForm() {
     const result = await submitApplication(payload);
     if (result.ok) {
       setStatus("success");
+      // Отправка конверсии в аналитику (в GA4 отметьте событие как ключевое)
+      if (typeof window !== "undefined") {
+        window.gtag?.("event", "generate_lead", { method: contactMethod });
+        const ymId = Number(site.analytics.yandexMetrika);
+        if (ymId) window.ym?.(ymId, "reachGoal", "zayavka");
+      }
     } else {
       setStatus("error");
     }
